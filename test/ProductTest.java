@@ -74,4 +74,21 @@ public class ProductTest {
 			}
 		});
 	}
+	
+	@Test
+	public void testDelete() {
+		running(testServer(PORT), new Runnable() {
+			@Override
+			public void run() {
+				String body = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.expect().statusCode(200)
+				.when().delete("/product/5").andReturn().body().asString();
+				
+				JsonNode node = Json.parse(body);
+				Assert.assertEquals("200", node.get("code").asText());
+				Assert.assertEquals("OK", node.get("status").asText());
+			}
+		});
+	}
 }
