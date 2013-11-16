@@ -56,4 +56,22 @@ public class ProductTest {
 			}
 		});
 	}
+	
+	@Test
+	public void testUpdate() {
+		running(testServer(PORT), new Runnable() {
+			@Override
+			public void run() {
+				String body = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.content("{\"productId\":5,\"productName\":\"IPHONE\"}")
+				.expect().statusCode(200)
+				.when().put("/product/5").andReturn().body().asString();
+				
+				JsonNode node = Json.parse(body);
+				Assert.assertEquals(5, node.get("productId").asInt());
+				Assert.assertEquals("IPHONE", node.get("productName").asText());
+			}
+		});
+	}
 }
