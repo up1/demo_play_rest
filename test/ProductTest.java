@@ -10,6 +10,7 @@ import play.libs.Json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.http.ContentType;
 
 public class ProductTest {
 
@@ -33,7 +34,25 @@ public class ProductTest {
 				String body = RestAssured.expect().statusCode(200).when().get("/product").andReturn().body().asString();
 				JsonNode node = Json.parse(body);
 				Assert.assertTrue(node.findPath("products").isArray());
-				Assert.assertEquals(3, node.findPath("products"));
+				Assert.assertEquals(3, node.findPath("products").size());
+			}
+		});
+	}
+
+	@Test
+	public void testCreate() {
+		running(testServer(PORT), new Runnable() {
+			@Override
+			public void run() {
+				String body = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.content("{\"productId\":5,\"productName\":\"IPHONE\"}")
+				.expect().statusCode(200)
+				.when().post("/product").andReturn().body().asString();
+				
+				JsonNode node = Json.parse(body);
+				Assert.assertEquals(5, node.get("productId").asInt());
+				Assert.assertEquals("IPHONE", node.get("productName").asText());
 			}
 		});
 	}
