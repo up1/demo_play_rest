@@ -1,12 +1,12 @@
 package controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import models.Product;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ProductController extends Controller {
@@ -15,45 +15,31 @@ public class ProductController extends Controller {
 		ObjectNode result = Json.newObject();
 		result.put("code", "200");
 		result.put("status", "OK");
-		result.putPOJO("products", Json.toJson(Products.getAll()));
+		result.putPOJO("products", Json.toJson(Product.getAll()));
 		return ok(result);
 	}
 
-}
-
-class Products {
-	public static List<Product> getAll() {
-		List<Product> list = new ArrayList<Product>();
-		list.add(new Product(1, "IPAD 1"));
-		list.add(new Product(2, "IPAD 2"));
-		list.add(new Product(3, "IPAD 3"));
-		return list;
+	@BodyParser.Of(BodyParser.Json.class)
+	public static Result create() {
+		JsonNode json = request().body().asJson();
+		Product product = Json.fromJson(json, Product.class);
+		// TODO for insert data to storage
+		return ok(Json.toJson(product));
 	}
-}
-
-class Product {
-	private int productId;
-	private String productName;
 	
-	public Product(int productId, String productName) {
-		this.productId = productId;
-		this.productName = productName;
+	public static Result update(String id) {
+		JsonNode json = request().body().asJson();
+		Product product = Json.fromJson(json, Product.class);
+		// TODO for update data to storage
+		return ok(Json.toJson(product));
 	}
-
-	public int getProductId() {
-		return productId;
-	}
-
-	public void setProductId(int productId) {
-		this.productId = productId;
-	}
-
-	public String getProductName() {
-		return productName;
-	}
-
-	public void setProductName(String productName) {
-		this.productName = productName;
+	
+	public static Result delete(String id) {
+		// TODO for delete data in storage
+		ObjectNode result = Json.newObject();
+		result.put("code", "200");
+		result.put("status", "OK");
+		return ok(result);
 	}
 
 }
